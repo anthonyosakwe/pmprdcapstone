@@ -1,36 +1,96 @@
-<video width="640" height="360" controls preload="none">
-  <!-- Replace the URL below with the one you copied in Step 2 -->
-  <source src="video1.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-<video width="640" height="360" controls preload="none">
-  <!-- Replace the URL below with the one you copied in Step 2 -->
-  <source src="video2.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-<video width="640" height="360" controls preload="none">
-  <!-- Replace the URL below with the one you copied in Step 2 -->
-  <source src="video3" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  /* 1. STYLES (KEEPING THE NETFLIX LOOK) */
+  body { background-color: #141414; color: white; font-family: 'Helvetica', sans-serif; text-align: center; }
+  .player-container { max-width: 800px; margin: 50px auto; background: #000; padding: 20px; border-radius: 10px; }
+  #video-title { font-size: 1.5rem; margin-bottom: 15px; color: #e50914; }
 
+  /* New: Added a scrollbar for your 20 buttons */
+  .playlist { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 20px; 
+    overflow-x: auto; /* Side-to-side scrolling */
+    padding: 15px;
+    white-space: nowrap;
+  }
+  
+  .media-btn {
+    background: #333; color: white; border: none; padding: 10px 20px; border-radius: 4px;
+    cursor: pointer; transition: 0.3s; font-weight: bold; flex-shrink: 0;
+  }
+  .media-btn:hover { background: #e50914; }
+  .next-btn { background: white; color: black; margin-top: 20px; padding: 12px 30px; border-radius: 4px; cursor: pointer; }
+</style>
+</head>
 
+<body>
 
+<div class="player-container">
+  <h3 id="video-title">Ready to Play</h3>
+  
+  <video id="mainPlayer" width="100%" controls style="max-height: 400px; background: #000;">
+    <source id="mediaSource" src="" type="video/mp4">
+  </video>
 
-<audio controls>
-  <!-- Replace with your raw link from step 2 -->
-  <source src="audio1.mp3" type="audio/mp3">
-  Your browser does not support the audio element.
-</audio>
-<audio controls>
-  <!-- Replace with your raw link from step 2 -->
-  <source src="audio2.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
+  <!-- THE PARKING SPOT: Buttons go here automatically -->
+  <div class="playlist" id="button-hub"></div>
 
-<audio controls>
-  <!-- Replace with your raw link from step 2 -->
-  <source src="audio3.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
+  <button class="next-btn" onclick="nextTrack()">NEXT EPISODE ⏭️</button>
+</div>
 
+<script>
+  // 2. THE MASTER LIST (Add all 20 files here)
+  const playlist = [
+    { src: 'video1.mp4', title: 'Welcome' },
+    { src: 'video2.mp4', title: 'Live Demo' },
+    { src: 'video3.mp4', title: 'Live Demo' },
+    { src: 'audio1.mp3', title: 'Audio Guide' },
+    { src: 'audio2.mp3', title: 'Audio Guide' },
+    { src: 'audio3.mp3', title: 'Audio Guide' },
+    { src: 'audio4.mp3', title: 'Audio Guide' },
+    { src: 'audio5.mp3', title: 'Audio Guide' },
+
+    
+    // Keep adding your other 17 files here...
+  ];
+
+  let currentIndex = 0;
+  const player = document.getElementById('mainPlayer');
+  const source = document.getElementById('mediaSource');
+  const titleDisplay = document.getElementById('video-title');
+  const buttonContainer = document.getElementById('button-hub');
+
+  // 3. THE AUTOMATION (Replaces the manual button code)
+  playlist.forEach((item, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'media-btn';
+    btn.innerText = `EP ${index + 1}: ${item.title}`;
+    
+    btn.onclick = () => {
+      currentIndex = index;
+      changeMedia(item.src, item.title);
+    };
+    
+    buttonContainer.appendChild(btn);
+  });
+
+  // 4. THE CORE FUNCTIONS
+  function changeMedia(src, title) {
+    source.type = src.endsWith('.mp3') ? "audio/mpeg" : "video/mp4";
+    source.src = src;
+    titleDisplay.innerText = title;
+    player.load(); 
+    player.play();
+  }
+
+  function nextTrack() {
+    currentIndex = (currentIndex + 1) % playlist.length;
+    changeMedia(playlist[currentIndex].src, playlist[currentIndex].title);
+  }
+</script>
+
+</body>
+</html>
