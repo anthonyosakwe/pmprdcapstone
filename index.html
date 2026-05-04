@@ -3,40 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Media Hub</title>
+    <title>Netflix-Style Media Hub</title>
     <style>
-        /* THE LOOK: Dark mode Netflix style */
+        /* 1. THE LOOK: Dark mode & Cinema styling */
         body { background-color: #141414; color: white; font-family: 'Helvetica', Arial, sans-serif; text-align: center; margin: 0; padding: 20px; }
         
         .player-container { max-width: 850px; margin: auto; background: #000; padding: 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
         
         #video-title { font-size: 1.6rem; margin-bottom: 15px; color: #e50914; min-height: 1.6em; }
 
-        /* THE MENU: Horizontal scrolling for 20+ files */
+        /* 2. THE MENU: Side-scrolling for 20+ files */
         .playlist { 
-            display: flex; 
-            gap: 12px; 
-            margin-top: 20px; 
-            overflow-x: auto; 
-            padding: 20px 10px;
-            scrollbar-width: thin; /* For Firefox */
-            scrollbar-color: #e50914 #333;
+            display: flex; gap: 12px; margin-top: 20px; overflow-x: auto; padding: 20px 10px;
+            scrollbar-width: thin; scrollbar-color: #e50914 #333;
         }
         
-        /* Styled buttons */
+        /* 3. BUTTONS: Netflix red hover effect */
         .media-btn {
             background: #333; color: white; border: none; padding: 12px 24px; border-radius: 6px;
             cursor: pointer; transition: 0.3s; font-weight: bold; flex-shrink: 0;
         }
-        
         .media-btn:hover { background: #e50914; transform: translateY(-3px); }
         
         .controls-row { margin-top: 25px; }
-
-        .next-btn { 
-            background: white; color: black; border: none; padding: 14px 40px; 
-            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem;
-        }
+        .next-btn { background: white; color: black; border: none; padding: 14px 40px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .next-btn:hover { background: #ccc; }
     </style>
 </head>
@@ -45,13 +35,13 @@
 <div class="player-container">
     <h3 id="video-title">Press Play to Start</h3>
     
-    <!-- Main screen: Handles video and shows a generic player for audio -->
-    <video id="mainPlayer" width="100%" controls style="max-height: 450px; border-radius: 4px; background: #111;">
+    <!-- MAIN SCREEN: 'poster.jpg' is the default logo shown at start -->
+    <video id="mainPlayer" width="100%" controls poster="poster.jpg" style="max-height: 450px; border-radius: 4px; background: #111;">
         <source id="mediaSource" src="" type="video/mp4">
         Your browser does not support the media player.
     </video>
 
-    <!-- THE AUTO-MENU: JavaScript will fill this with your 20+ buttons -->
+    <!-- AUTO-MENU -->
     <div class="playlist" id="button-hub"></div>
 
     <div class="controls-row">
@@ -60,15 +50,20 @@
 </div>
 
 <script>
-    // 1. MASTER LIST: Add your 6 files (and future files) here
+    // 1. THE MASTER LIST: Note the COMMAS at the end of each line!
     const playlist = [
-        { src: 'video1.mp4', title: 'Introduction Video' },
-        { src: 'video2.mp4', title: 'Main Project Demo' },
-        { src: 'video3.mp4', title: 'Technical Walkthrough' },
-        { src: 'audio1.mp3', title: 'Narration 1 (MP3)' },
-        { src: 'narration2.m4a', title: 'Voice Note (M4A)' },
-        { src: 'audio3.mp3', title: 'Background Story' }
-        // To add more, just add a comma and another { src: '', title: '' }
+        { src: 'video1.mp4', title: 'Intro Video', poster: 'thumbnail.jpg' },
+        { src: 'narration.m4a', title: 'Chapter 1 (Audio)', poster: 'cover.jpg' },
+        { src: 'lesson.mp3', title: 'Lesson 2 (Audio)', poster: 'cover.jpg' },
+        { src: 'video2.mp4', title: 'Final Project Demo', poster: 'thumbnail.jpg' }, // Added comma
+        { src: 'video1.mp4', title: 'Intro Video v2', poster: 'thumbnail.jpg' }, // Added comma
+        { src: 'narration.m4a', title: 'Chapter 1 (Audio) v2', poster: 'cover.jpg' }, // Added comma
+        { src: 'lesson.mp3', title: 'Lesson 2 (Audio) v2', poster: 'cover.jpg' }, // Added comma
+        { src: 'video2.mp4', title: 'Final Project Demo v2', poster: 'thumbnail.jpg' }, // Added comma
+        { src: 'video1.mp4', title: 'Intro Video v3', poster: 'thumbnail.jpg' }, // Added comma
+        { src: 'narration.m4a', title: 'Chapter 1 (Audio) v3', poster: 'cover.jpg' }, // Added comma
+        { src: 'lesson.mp3', title: 'Lesson 2 (Audio) v3', poster: 'cover.jpg' }, // Added comma
+        { src: 'video2.mp4', title: 'Final Project Demo v3', poster: 'thumbnail.jpg' } // Last item: No comma needed
     ];
 
     let currentIndex = 0;
@@ -77,7 +72,7 @@
     const titleDisplay = document.getElementById('video-title');
     const buttonContainer = document.getElementById('button-hub');
 
-    // 2. AUTOMATIC MENU BUILDER: Creates buttons for you
+    // 2. AUTOMATIC MENU BUILDER
     playlist.forEach((item, index) => {
         const btn = document.createElement('button');
         btn.className = 'media-btn';
@@ -85,34 +80,34 @@
         
         btn.onclick = () => {
             currentIndex = index;
-            changeMedia(item.src, item.title);
+            changeMedia(item);
         };
         
         buttonContainer.appendChild(btn);
     });
 
-    // 3. THE LOGIC: Switches files and handles formats (mp4, mp3, m4a)
-    function changeMedia(src, title) {
-        // Handle all your file formats correctly
-        if (src.endsWith('.mp3')) {
+    // 3. THE LOGIC
+    function changeMedia(track) {
+        if (track.src.endsWith('.mp3')) {
             source.type = "audio/mpeg";
-        } else if (src.endsWith('.m4a')) {
+        } else if (track.src.endsWith('.m4a')) {
             source.type = "audio/mp4";
         } else {
             source.type = "video/mp4";
         }
 
-        source.src = src;
-        titleDisplay.innerText = "Now Playing: " + title;
+        source.src = track.src;
+        player.poster = track.poster;
+        titleDisplay.innerText = "Now Playing: " + track.title;
         
-        player.load(); // Reload the player with the new file
-        player.play(); // Start playing immediately
+        player.load(); 
+        player.play(); 
     }
 
-    // 4. THE NEXT BUTTON LOGIC
+    // 4. NEXT BUTTON LOGIC
     function nextTrack() {
         currentIndex = (currentIndex + 1) % playlist.length;
-        changeMedia(playlist[currentIndex].src, playlist[currentIndex].title);
+        changeMedia(playlist[currentIndex]);
     }
 </script>
 
